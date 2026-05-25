@@ -1,0 +1,111 @@
+
+<div id="uml" style="padding:1rem 0"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '13px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+const { svg } = await mermaid.render('uml-svg', `classDiagram
+  class Usuario {
+    +UUID id
+    +str nome
+    +str email
+    +str role
+    +autenticar() bool
+    +gerar_token() str
+  }
+  class Doador {
+    +UUID id
+    +str cpf
+    +float lat
+    +float lng
+    +cadastrar_item(item) bool
+    +listar_itens() list
+  }
+  class Beneficiario {
+    +UUID id
+    +str cpf
+    +int num_membros
+    +float lat
+    +float lng
+    +fazer_solicitacao(sol) bool
+    +listar_solicitacoes() list
+  }
+  class Organizacao {
+    +UUID id
+    +str cnpj
+    +str endereco
+    +float lat
+    +float lng
+    +intermediar_doacao(d) bool
+  }
+  class ItemDoado {
+    +UUID id
+    +str categoria
+    +str descricao
+    +str status
+    +atualizar_status(s) void
+  }
+  class Solicitacao {
+    +UUID id
+    +str categoria
+    +str descricao
+    +str status
+    +atualizar_status(s) void
+  }
+  class Doacao {
+    +UUID id
+    +str status
+    +date data_entrega
+    +confirmar_entrega() bool
+  }
+  class AlgoritmoMatching {
+    +grafo Graph
+    +calcular_distancia(a,b) float
+    +match(itens, sols) list
+    +haversine(lat1,lng1,lat2,lng2) float
+  }
+
+  Usuario <|-- Doador
+  Usuario <|-- Beneficiario
+  Usuario <|-- Organizacao
+  Doador "1" --> "0..*" ItemDoado : cadastra
+  Beneficiario "1" --> "0..*" Solicitacao : faz
+  ItemDoado "1" --> "0..1" Doacao : gera
+  Solicitacao "1" --> "0..1" Doacao : recebe
+  Organizacao "1" --> "0..*" Doacao : intermedia
+  AlgoritmoMatching ..> ItemDoado : usa
+  AlgoritmoMatching ..> Solicitacao : usa
+`);
+document.getElementById('uml').innerHTML = svg;
+document.querySelectorAll('#uml svg .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+</script>
