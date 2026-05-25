@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DoaçõesApp</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f5f3ee;--bg2:#eceae3;--surface:#fff;--border:#d8d4cb;
+  --text:#1a1916;--text2:#6b6760;--text3:#9c9890;
+  --accent:#2d5a3d;--accent2:#3d7a55;--accent-bg:#e8f0eb;
+  --red:#c0392b;--red-bg:#fdf0ee;--amber:#b8610a;--amber-bg:#fef6ee;
+  --blue:#1a4a7a;--blue-bg:#edf3fb;
+  --r:12px;--rs:8px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.logo{padding:22px 20px 18px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-text{font-size:15px;font-weight:600;letter-spacing:-.3px}
+.logo-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.nav{flex:1;padding:12px 10px}
+.nav-section{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);padding:10px 10px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--rs);cursor:pointer;color:var(--text2);font-size:13.5px;font-weight:400;transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent);font-weight:500}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;font-size:11px;font-weight:500;background:var(--accent-bg);color:var(--accent);padding:1px 7px;border-radius:20px}
+.user-area{padding:16px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--rs);background:var(--bg)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500}
+.user-role{font-size:11px;color:var(--text3)}
+
+/* MAIN */
+.main{margin-left:220px;min-height:100vh;padding:28px 32px}
+.page{display:none}
+.page.active{display:block}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-size:22px;font-weight:600;letter-spacing:-.5px}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--rs);font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-outline{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-outline:hover{background:var(--bg)}
+.btn svg{width:14px;height:14px}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.metric-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.metric-value{font-size:28px;font-weight:600;letter-spacing:-1px;line-height:1}
+.metric-sub{font-size:12px;color:var(--text3);margin-top:4px}
+.progress-bar{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s ease}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:600}
+.card-body{padding:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--bg2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.badge-green{background:var(--accent-bg);color:var(--accent)}
+.badge-amber{background:var(--amber-bg);color:var(--amber)}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.badge-gray{background:var(--bg2);color:var(--text2)}
+
+/* FORM */
+.form-group{margin-bottom:16px}
+label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--rs);font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);transition:border-color .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,90,61,.1)}
+textarea{resize:vertical;min-height:80px}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.auth-card{width:400px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;box-shadow:var(--shadow)}
+.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.auth-logo-icon{width:40px;height:40px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px}
+.auth-title{font-size:20px;font-weight:600}
+.auth-sub{font-size:13px;color:var(--text2);margin-top:2px}
+.auth-footer{margin-top:14px;text-align:center;font-size:13px;color:var(--text2)}
+.auth-link{color:var(--accent);cursor:pointer;font-weight:500}
+.auth-link:hover{text-decoration:underline}
+
+/* CONTAS TESTE */
+.contas-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.conta-btn{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px 8px;cursor:pointer;text-align:center;transition:all .15s;font-family:'DM Sans',sans-serif}
+.conta-btn:hover{border-color:var(--accent);background:var(--accent-bg)}
+.conta-role{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text3);margin-bottom:3px}
+.conta-email{font-size:11px;color:var(--text2)}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--text3);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* API STATUS */
+.api-status{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);background:var(--bg);border:1px solid var(--border);padding:5px 10px;border-radius:20px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--text3)}
+.status-dot.online{background:#2ecc71}
+.status-dot.offline{background:var(--red)}
+
+/* ALERT */
+.alert{padding:11px 16px;border-radius:var(--rs);font-size:13px;margin-bottom:14px;display:none}
+.alert.show{display:block}
+.alert-success{background:var(--accent-bg);color:var(--accent);border:1px solid #b8d4c0}
+.alert-error{background:var(--red-bg);color:var(--red);border:1px solid #f0c0bb}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.empty-text{font-size:13px}
+
+/* LOADING */
+.loading{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOKEN BOX */
+.token-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);word-break:break-all;max-height:60px;overflow:hidden}
+
+.mono{font-family:'DM Mono',monospace;font-size:12px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{width:460px;max-height:90vh;overflow-y:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:14px;font-weight:600}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;line-height:1;padding:2px 6px;border-radius:4px}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:20px}
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH ══════════════════════════════════ -->
+<div id="auth-screen" class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🤝</div>
+      <div>
+        <div class="auth-title">DoaçõesApp</div>
+        <div class="auth-sub">Sistema de Gestão de Doações — ODS 1</div>
+      </div>
+    </div>
+
+    <div id="auth-alert" class="alert"></div>
+
+    <!-- CONTAS DE TESTE -->
+    <div id="contas-teste-section">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Entrar com conta de teste</div>
+      <div class="contas-grid">
+        <div class="conta-btn" onclick="loginTeste('doador@teste.com','123456')">
+          <div class="conta-role">Doador</div>
+          <div class="conta-email">doador@teste.com</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">senha: 123456</div>
+        </div>
+        <div class="conta-btn" onclick="loginTeste('beneficiario@teste.com','123456')">
+          <div class="conta-role">Beneficiário</div>
+          <div class="conta-email">beneficiario@teste.com</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">senha: 123456</div>
+        </div>
+        <div class="conta-btn" onclick="loginTeste('organizacao@teste.com','123456')">
+          <div class="conta-role">Organização</div>
+          <div class="conta-email">organizacao@teste.com</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">senha: 123456</div>
+        </div>
+      </div>
+      <div class="divider">ou entre com sua conta</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="login-form">
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="login-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" onclick="doLogin()" id="btn-login">Entrar</button>
+      <div class="auth-footer">
+        Não tem conta? <span class="auth-link" onclick="toggleAuth('registro')">Criar conta</span>
+      </div>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="registro-form" style="display:none">
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" id="reg-nome" placeholder="João Silva">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="reg-email" placeholder="seu@email.com">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="reg-senha" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label>Tipo de conta</label>
+        <select id="reg-role">
+          <option value="doador">Doador</option>
+          <option value="beneficiario">Beneficiário</option>
+          <option value="organizacao">Organização</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" onclick="doRegistro()" id="btn-registro">Criar conta</button>
+      <div class="auth-footer">
+        Já tem conta? <span class="auth-link" onclick="toggleAuth('login')">Entrar</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ════════════════════════════════════ -->
+<div id="app-shell" style="display:none">
+
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">
+        <div class="logo-icon">🤝</div>
+        <div>
+          <div class="logo-text">DoaçõesApp</div>
+          <div class="logo-sub">ODS 1 — Erradicação da Pobreza</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+      <button class="nav-item active" onclick="showPage('dashboard',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" onclick="showPage('itens',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        Itens Doados
+        <span class="nav-badge" id="badge-itens">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('solicitacoes',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Solicitações
+        <span class="nav-badge" id="badge-sols">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('matching',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        Matching
+      </button>
+      <div class="nav-section" style="margin-top:8px">Conta</div>
+      <button class="nav-item" onclick="doLogout()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </button>
+    </nav>
+    <div class="user-area">
+      <div class="user-card">
+        <div class="avatar" id="sb-avatar">?</div>
+        <div>
+          <div class="user-name" id="sb-name">—</div>
+          <div class="user-role" id="sb-role">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Visão geral do sistema</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="api-status"><div class="status-dot" id="api-dot"></div><span id="api-label">Verificando...</span></div>
+          <button class="btn btn-outline" onclick="loadDashboard()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+            Atualizar
+          </button>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Itens Cadastrados</div><div class="metric-value" id="m-itens">—</div><div class="metric-sub">no sistema</div></div>
+        <div class="metric"><div class="metric-label">Solicitações</div><div class="metric-value" id="m-sols">—</div><div class="metric-sub">recebidas</div></div>
+        <div class="metric"><div class="metric-label">Doações Geradas</div><div class="metric-value" id="m-doacoes">—</div><div class="metric-sub">pelo matching</div></div>
+        <div class="metric"><div class="metric-label">Taxa de Atendimento</div><div class="metric-value" id="m-taxa">—</div><div class="metric-sub"><div class="progress-bar"><div class="progress-fill" id="prog-taxa" style="width:0%"></div></div></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Status das Doações</span></div>
+          <div class="card-body">
+            <div id="status-breakdown" style="display:flex;flex-direction:column;gap:12px">
+              <div style="color:var(--text3);font-size:13px">Carregando...</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Token JWT</span></div>
+          <div class="card-body">
+            <div class="token-box" id="token-display">—</div>
+            <div style="margin-top:10px;font-size:12px;color:var(--text3)">Enviado em todas as requisições via <span class="mono">Authorization: Bearer</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ITENS -->
+    <div id="page-itens" class="page">
+      <div class="topbar">
+        <div><div class="page-title">Itens Doados</div><div class="page-sub">Gerencie os itens disponíveis para doação</div></div>
+        <button class="btn btn-primary" onclick="openModal('modal-item')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Doar Item
+        </button>
+      </div>
+      <div id="alert-item" class="alert"></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Itens disponíveis</span>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="filtro-cat" placeholder="Filtrar categoria..." style="width:180px;padding:6px 10px;font-size:12px">
+            <button class="btn btn-outline" onclick="loadItens()" style="padding:6px 12px;font-size:12px">Buscar</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Categoria</th><th>Descrição</th><th>Status</th><th>Localização</th></tr></thead>
+            <tbody id="tbody-itens"><tr><td colspan="5"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Nenhum item ainda</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLICITAÇÕES -->
+    <div id="page-solicitacoes" class="page">
+      <div class="topbar">
+        <div><div class="page-title">Solicitações</div><div class="page-sub">Pedidos de ajuda dos beneficiários</div></div>
+        <button class="btn btn-primary" onclick="openModal('modal-sol')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Pedir Item
+        </button>
+      </div>
+      <div id="alert-sol" class="alert"></div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Solicitações em aberto</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Categoria</th><th>Descrição</th><th>Status</th><th>Localização</th></tr></thead>
+            <tbody id="tbody-sols"><tr><td colspan="5"><div class="empty"><div class="empty-icon">🙋</div><div class="empty-text">Nenhuma solicitação ainda</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATCHING -->
+    <div id="page-matching" class="page">
+      <div class="topbar">
+        <div><div class="page-title">Algoritmo de Matching</div><div class="page-sub">Casa doações com necessidades usando grafos (NetworkX + Haversine)</div></div>
+      </div>
+      <div id="alert-matching" class="alert"></div>
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Parâmetros</span></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Raio máximo de distância (km)</label>
+              <input type="number" id="raio-km" value="50" min="1" max="9999">
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:16px">
+              Usa <strong>Fórmula de Haversine</strong> para calcular distâncias e <strong>grafo bipartido</strong> para casar itens com solicitações da mesma categoria.
+            </div>
+            <button class="btn btn-primary" id="btn-matching" onclick="executarMatching()" style="width:100%;justify-content:center">
+              ▶ Executar Matching
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Resultado</span></div>
+          <div class="card-body">
+            <div id="matching-result"><div class="empty"><div class="empty-icon">🔗</div><div class="empty-text">Execute o algoritmo para ver os pares</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Doações geradas</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID Doação</th><th>Item</th><th>Solicitação</th><th>Distância</th><th>Status</th></tr></thead>
+            <tbody id="tbody-matching"><tr><td colspan="5"><div class="empty"><div class="empty-icon">⚡</div><div class="empty-text">Aguardando execução</div></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ MODAL ITEM ═══════════════════════════ -->
+<div id="modal-item" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-item')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🎁 Doar Item</span>
+      <button class="modal-close" onclick="closeModal('modal-item')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alert-modal-item" class="alert"></div>
+      <div class="form-group">
+        <label>Categoria *</label>
+        <select id="item-cat">
+          <option value="alimentos">Alimentos</option>
+          <option value="roupas">Roupas</option>
+          <option value="moveis">Móveis</option>
+          <option value="eletronicos">Eletrônicos</option>
+          <option value="higiene">Higiene Pessoal</option>
+          <option value="brinquedos">Brinquedos</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea id="item-desc" placeholder="Descreva o item que deseja doar..."></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Latitude (opcional)</label>
+          <input type="number" id="item-lat" placeholder="-22.7588" step="0.0001">
+        </div>
+        <div class="form-group">
+          <label>Longitude (opcional)</label>
+          <input type="number" id="item-lng" placeholder="-43.4547" step="0.0001">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-criar-item" onclick="criarItem()" style="width:100%;justify-content:center;padding:11px">
+        Cadastrar Item
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL SOLICITAÇÃO ═════════════════════ -->
+<div id="modal-sol" class="modal-overlay" onclick="if(event.target===this)closeModal('modal-sol')">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🙋 Pedir Item</span>
+      <button class="modal-close" onclick="closeModal('modal-sol')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="alert-modal-sol" class="alert"></div>
+      <div class="form-group">
+        <label>Categoria necessária *</label>
+        <select id="sol-cat">
+          <option value="alimentos">Alimentos</option>
+          <option value="roupas">Roupas</option>
+          <option value="moveis">Móveis</option>
+          <option value="eletronicos">Eletrônicos</option>
+          <option value="higiene">Higiene Pessoal</option>
+          <option value="brinquedos">Brinquedos</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Descrição da necessidade</label>
+        <textarea id="sol-desc" placeholder="Descreva o que você precisa..."></textarea>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Latitude (opcional)</label>
+          <input type="number" id="sol-lat" placeholder="-22.7588" step="0.0001">
+        </div>
+        <div class="form-group">
+          <label>Longitude (opcional)</label>
+          <input type="number" id="sol-lng" placeholder="-43.4547" step="0.0001">
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-criar-sol" onclick="criarSol()" style="width:100%;justify-content:center;padding:11px">
+        Enviar Solicitação
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:5000';
+let token = null;
+let usuario = null;
+
+// ── UTILS ──────────────────────────────────────────────────────────────
+const shortId = id => id ? id.slice(0,8)+'…' : '—';
+
+function statusBadge(s) {
+  const m = {
+    disponivel:'badge-green,Disponível', reservado:'badge-amber,Reservado',
+    entregue:'badge-blue,Entregue', cancelado:'badge-red,Cancelado',
+    aberta:'badge-green,Aberta', em_atendimento:'badge-amber,Em atendimento',
+    atendida:'badge-blue,Atendida', pendente:'badge-amber,Pendente',
+    confirmada:'badge-blue,Confirmada',
+  };
+  const [cls,label] = (m[s]||'badge-gray,'+s).split(',');
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function showAlert(id, msg, type='error') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = `alert alert-${type==='success'?'success':'error'} show`;
+  el.textContent = msg;
+  setTimeout(() => el.classList.remove('show'), 4500);
+}
+
+function setBtnLoading(id, loading, label='') {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<span class="loading"></span>'
+    : label || btn.dataset.label || btn.textContent;
+  if (label) btn.dataset.label = label;
+}
+
+// ── MODALS ─────────────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ── AUTH ───────────────────────────────────────────────────────────────
+function toggleAuth(mode) {
+  document.getElementById('login-form').style.display    = mode==='login'    ? 'block' : 'none';
+  document.getElementById('registro-form').style.display = mode==='registro' ? 'block' : 'none';
+}
+
+async function loginTeste(email, senha) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-senha').value = senha;
+  toggleAuth('login');
+  await doLogin();
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value.trim();
+  if (!email || !senha) { showAlert('auth-alert','Preencha e-mail e senha'); return; }
+
+  setBtnLoading('btn-login', true);
+  try {
+    const r = await fetch(`${API}/api/auth/login`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, senha})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.msg || 'Credenciais inválidas');
+    token = d.access_token;
+    usuario = d.usuario;
+    enterApp();
+  } catch(e) {
+    showAlert('auth-alert', e.message);
+    setBtnLoading('btn-login', false, 'Entrar');
+  }
+}
+
+async function doRegistro() {
+  const nome  = document.getElementById('reg-nome').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const senha = document.getElementById('reg-senha').value.trim();
+  const role  = document.getElementById('reg-role').value;
+  if (!nome||!email||!senha) { showAlert('auth-alert','Preencha todos os campos'); return; }
+
+  setBtnLoading('btn-registro', true);
+  try {
+    const r = await fetch(`${API}/api/auth/registro`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({nome, email, senha, role})
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.msg || 'Erro ao criar conta');
+    showAlert('auth-alert','Conta criada! Faça o login.','success');
+    toggleAuth('login');
+    document.getElementById('login-email').value = email;
+    document.getElementById('login-senha').value = senha;
+  } catch(e) {
+    showAlert('auth-alert', e.message);
+  } finally {
+    setBtnLoading('btn-registro', false, 'Criar conta');
+  }
+}
+
+function enterApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display   = 'block';
+  const initials = (usuario.nome||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('sb-avatar').textContent = initials;
+  document.getElementById('sb-name').textContent   = usuario.nome;
+  document.getElementById('sb-role').textContent   = usuario.role;
+  document.getElementById('token-display').textContent = token;
+  loadDashboard();
+  loadItens();
+  loadSols();
+}
+
+function doLogout() {
+  token = null; usuario = null;
+  document.getElementById('app-shell').style.display   = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+// ── API HELPERS ────────────────────────────────────────────────────────
+function authHeaders() {
+  return {'Content-Type':'application/json', 'Authorization': `Bearer ${token}`};
+}
+
+async function apiGet(path) {
+  const r = await fetch(`${API}${path}`, {headers: authHeaders()});
+  if (!r.ok) { const d=await r.json(); throw new Error(d.msg||`Erro ${r.status}`); }
+  return r.json();
+}
+
+async function apiPost(path, body) {
+  const r = await fetch(`${API}${path}`, {
+    method:'POST', headers: authHeaders(), body: JSON.stringify(body)
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.msg || `Erro ${r.status}`);
+  return d;
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const d = await apiGet('/api/relatorios/impacto');
+    document.getElementById('m-itens').textContent   = d.total_itens_cadastrados ?? 0;
+    document.getElementById('m-sols').textContent    = d.total_solicitacoes ?? 0;
+    document.getElementById('m-doacoes').textContent = d.total_doacoes_geradas ?? 0;
+    const taxa = d.taxa_atendimento_pct ?? 0;
+    document.getElementById('m-taxa').textContent = taxa + '%';
+    document.getElementById('prog-taxa').style.width = taxa + '%';
+    document.getElementById('status-breakdown').innerHTML = `
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:13px;color:var(--text2)">Entregues</span>
+        <span style="font-weight:600">${d.doacoes_entregues??0}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:13px;color:var(--text2)">Pendentes</span>
+        <span style="font-weight:600">${d.doacoes_pendentes??0}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:13px;color:var(--text2)">Total solicitações</span>
+        <span style="font-weight:600">${d.total_solicitacoes??0}</span>
+      </div>`;
+    // api status
+    document.getElementById('api-dot').className = 'status-dot online';
+    document.getElementById('api-label').textContent = 'API conectada';
+  } catch {
+    document.getElementById('api-dot').className = 'status-dot offline';
+    document.getElementById('api-label').textContent = 'API offline';
+  }
+}
+
+// ── ITENS ──────────────────────────────────────────────────────────────
+async function loadItens() {
+  const cat = document.getElementById('filtro-cat')?.value || '';
+  try {
+    const itens = await apiGet('/api/itens' + (cat ? `?categoria=${cat}` : ''));
+    document.getElementById('badge-itens').textContent = itens.length;
+    document.getElementById('tbody-itens').innerHTML = itens.length
+      ? itens.map(i=>`
+          <tr>
+            <td class="mono">${shortId(i.id)}</td>
+            <td><span class="badge badge-gray">${i.categoria}</span></td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.descricao||'—'}</td>
+            <td>${statusBadge(i.status)}</td>
+            <td style="font-size:12px;color:var(--text3)">${i.lat?`${i.lat}, ${i.lng}`:'—'}</td>
+          </tr>`).join('')
+      : `<tr><td colspan="5"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Nenhum item encontrado</div></div></td></tr>`;
+  } catch(e) { console.error(e); }
+}
+
+async function criarItem() {
+  const categoria = document.getElementById('item-cat').value;
+  const descricao = document.getElementById('item-desc').value.trim();
+  const lat = parseFloat(document.getElementById('item-lat').value) || null;
+  const lng = parseFloat(document.getElementById('item-lng').value) || null;
+
+  setBtnLoading('btn-criar-item', true);
+  try {
+    await apiPost('/api/itens', {categoria, descricao, lat, lng});
+    closeModal('modal-item');
+    document.getElementById('item-desc').value = '';
+    document.getElementById('item-lat').value  = '';
+    document.getElementById('item-lng').value  = '';
+    showAlert('alert-item', '✔ Item cadastrado com sucesso!', 'success');
+    await loadItens();
+    await loadDashboard();
+  } catch(e) {
+    showAlert('alert-modal-item', e.message);
+  } finally {
+    setBtnLoading('btn-criar-item', false, 'Cadastrar Item');
+  }
+}
+
+// ── SOLICITAÇÕES ───────────────────────────────────────────────────────
+async function loadSols() {
+  try {
+    const sols = await apiGet('/api/solicitacoes');
+    document.getElementById('badge-sols').textContent = sols.length;
+    document.getElementById('tbody-sols').innerHTML = sols.length
+      ? sols.map(s=>`
+          <tr>
+            <td class="mono">${shortId(s.id)}</td>
+            <td><span class="badge badge-gray">${s.categoria}</span></td>
+            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.descricao||'—'}</td>
+            <td>${statusBadge(s.status)}</td>
+            <td style="font-size:12px;color:var(--text3)">${s.lat?`${s.lat}, ${s.lng}`:'—'}</td>
+          </tr>`).join('')
+      : `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🙋</div><div class="empty-text">Nenhuma solicitação ainda</div></div></td></tr>`;
+  } catch(e) { console.error(e); }
+}
+
+async function criarSol() {
+  const categoria = document.getElementById('sol-cat').value;
+  const descricao = document.getElementById('sol-desc').value.trim();
+  const lat = parseFloat(document.getElementById('sol-lat').value) || null;
+  const lng = parseFloat(document.getElementById('sol-lng').value) || null;
+
+  setBtnLoading('btn-criar-sol', true);
+  try {
+    await apiPost('/api/solicitacoes', {categoria, descricao, lat, lng});
+    closeModal('modal-sol');
+    document.getElementById('sol-desc').value = '';
+    document.getElementById('sol-lat').value  = '';
+    document.getElementById('sol-lng').value  = '';
+    showAlert('alert-sol', '✔ Solicitação enviada com sucesso!', 'success');
+    await loadSols();
+    await loadDashboard();
+  } catch(e) {
+    showAlert('alert-modal-sol', e.message);
+  } finally {
+    setBtnLoading('btn-criar-sol', false, 'Enviar Solicitação');
+  }
+}
+
+// ── MATCHING ───────────────────────────────────────────────────────────
+async function executarMatching() {
+  const raio = document.getElementById('raio-km').value || 50;
+  setBtnLoading('btn-matching', true);
+  try {
+    const d = await apiPost(`/api/matching/executar?raio=${raio}`, {});
+    document.getElementById('matching-result').innerHTML = `
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:36px;font-weight:600;letter-spacing:-1px;color:var(--accent)">${d.matches_gerados}</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px">pares gerados com sucesso</div>
+      </div>`;
+    document.getElementById('tbody-matching').innerHTML = d.doacoes?.length
+      ? d.doacoes.map(x=>`
+          <tr>
+            <td class="mono">${shortId(x.id)}</td>
+            <td class="mono">${shortId(x.item_id)}</td>
+            <td class="mono">${shortId(x.solicitacao_id)}</td>
+            <td>${x.distancia_km!=null ? x.distancia_km+' km' : '—'}</td>
+            <td>${statusBadge(x.status)}</td>
+          </tr>`).join('')
+      : `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Nenhum par encontrado — verifique categorias e raio</div></div></td></tr>`;
+    showAlert('alert-matching', `✔ Matching executado: ${d.matches_gerados} doações geradas`, 'success');
+    loadDashboard();
+  } catch(e) {
+    showAlert('alert-matching', e.message);
+  } finally {
+    setBtnLoading('btn-matching', false, '▶ Executar Matching');
+  }
+}
+</script>
+</body>
+</html>
